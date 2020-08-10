@@ -85,7 +85,7 @@ data(screen8)
 ttestClust(x=screen8$math, idx=screen8$sch.id, mu = 70)
 
 ## paired test
-## Test is marginal math scores have equal mean to marginal reading scores
+## Test equality of marginal means in math and reading scores
 ttestClust(x=screen8$math, y=screen8$read, idx=screen8$sch.id, paired=TRUE)
 
 ## unpaired test

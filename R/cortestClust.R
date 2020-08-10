@@ -4,7 +4,7 @@
 
 #' Test for Marginal Association Between Paired Clustered Data
 #'
-#' Test for association between paired samples in clustered data with potentially
+#' Test for marginal association between paired samples in clustered data with potentially
 #' informative cluster size.
 #'
 #' @param x,y numeric vectors of data values.
@@ -52,9 +52,10 @@
 #'
 #' @examples
 #' data(screen8)
+#' ## test if math and reading scores are marginally correlated using vectors
 #' cortestClust(screen8$read, screen8$math, screen8$sch.id)
 #'
-#' ## Formula interface.
+#' ## formula interface
 #' cortestClust(~ math + read, sch.id, data=screen8, method="kendall")
 #'
 #' @export

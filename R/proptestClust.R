@@ -51,7 +51,7 @@
 #' @examples
 #' data(screen8)
 #' ## using vectors
-#' ## math proficientcy determined by score >= 65
+#' ## suppose math proficiency is determined by score >= 65
 #' ## is the marginal proportion of students proficient in math at least 75%?
 #' screen8$math.p <- 1*(screen8$math>=65)
 #' proptestClust(screen8$math.p, screen8$sch.id, p = .75, alternative = "great")
@@ -76,7 +76,7 @@ proptestClust <- function(x, id, p = NULL, alternative = c("two.sided", "less", 
     x <- x[stats::complete.cases(x),]
     if (!(all(rowSums(x)>0)))
       stop("all clusters must have counts > 0")
-    if (!(all(x)>=0))
+    if (!(all(x>=0)))
       stop("elements of x must be nonnegative ")
     m <- nrow(x)
     xbar <- x[,2]/rowSums(x)

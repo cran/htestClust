@@ -25,7 +25,7 @@ A data frame with 2224 rows and 12 columns:
 data(screen8)
 }
 \description{
-Simulated hypothetical clustered data created for illustration of functions in the \code{htest.clust} package.
+Simulated hypothetical clustered data created for illustration of functions in the \code{htestClust} package.
 }
 \details{
 Hypothetical data simulated for the following scenario.

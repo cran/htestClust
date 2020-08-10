@@ -1,6 +1,6 @@
 #' Example data for informative cluster size
 #'
-#' Simulated hypothetical clustered data created for illustration of functions in the \code{htest.clust} package.
+#' Simulated hypothetical clustered data created for illustration of functions in the \code{htestClust} package.
 #'
 #' @name screen8
 #' @docType data

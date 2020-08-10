@@ -62,7 +62,7 @@ A list with class "\code{htest}" containing the following components:
 \item{M}{the number of clusters.}
 }
 \description{
-Test for association between paired samples in clustered data with potentially
+Test for marginal association between paired samples in clustered data with potentially
 informative cluster size.
 }
 \details{
@@ -77,9 +77,10 @@ is based on the Spearman coefficient analog of Lorenz \emph{et al.} (2018) modif
 }
 \examples{
 data(screen8)
+## test if math and reading scores are marginally correlated using vectors
 cortestClust(screen8$read, screen8$math, screen8$sch.id)
 
-## Formula interface.
+## formula interface
 cortestClust(~ math + read, sch.id, data=screen8, method="kendall")
 
 }
