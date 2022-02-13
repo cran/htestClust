@@ -1,6 +1,6 @@
 Package: htestClust
 Title: Reweighted Marginal Hypothesis Tests for Clustered Data
-Version: 0.2.0
+Version: 0.2.1
 Authors@R: c(
     person(given = "Mary", family = "Gregg", role = c("aut", "cre"), email = "megregg07@gmail.com", comment = c(ORCID = "0000-0003-2991-6939")),
     person(given = "Somnath", family = "Datta", role = "aut", comment = c(ORCID = "0000-0003-4381-1842")),
@@ -25,10 +25,10 @@ LazyData: true
 RoxygenNote: 7.1.0
 Imports: bootstrap, graphics, MASS, stats
 NeedsCompilation: no
-Packaged: 2020-08-07 14:24:05 UTC; konan
+Packaged: 2022-02-12 03:44:50 UTC; konan
 Author: Mary Gregg [aut, cre] (<https://orcid.org/0000-0003-2991-6939>),
   Somnath Datta [aut] (<https://orcid.org/0000-0003-4381-1842>),
   Doug Lorenz [aut] (<https://orcid.org/0000-0001-8114-0926>)
 Maintainer: Mary Gregg <megregg07@gmail.com>
 Repository: CRAN
-Date/Publication: 2020-08-10 10:40:02 UTC
+Date/Publication: 2022-02-13 13:00:09 UTC

@@ -99,7 +99,7 @@ icsPlot <- function(x, id, FUN = c("mean", "median", "var", "sd", "range", "IQR"
         colnames(tmptab) <- count[,1]
         yLAB <- ifelse(!is.null(ylab), paste(ylab), "proportion")
         legend.in <- legend
-        graphics::barplot(as.table(tmptab), legend = legend.in, xlab = xLAB, ylab = yLAB, ...)
+        graphics::barplot(as.table(tmptab), legend.text = legend.in, xlab = xLAB, ylab = yLAB, ...)
       }
     }
   }
@@ -133,7 +133,7 @@ icsPlot <- function(x, id, FUN = c("mean", "median", "var", "sd", "range", "IQR"
 
       yLAB <- ifelse(!is.null(ylab), paste(ylab), "proportion")
       legend.in <- legend
-      graphics::barplot(prop.table(counts, margin=2), legend = legend.in, xlab = xLAB, ylab = yLAB, ...)
+      graphics::barplot(prop.table(counts, margin=2), legend.text = legend.in, xlab = xLAB, ylab = yLAB, ...)
       }
     }
     else {
