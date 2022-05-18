@@ -1,0 +1,203 @@
+---
+title: "*htestClust*: a package for marginal inference of clustered data under informative cluster size"
+author: Mary Gregg, Somnath Datta, Douglas Lorenz
+bibliography: htestClustBib.bib
+link-citations: true
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{*htestClust*: a package for marginal inference of clustered data under informative cluster size}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(htestClust)
+```
+**Note:** This document is abridged from a longer article published in *R Journal*. 
+
+# Abstract
+When observations are collected in/organized into observation units, within which observations may be dependent, those observational units are often referred to as "clusters" and the data as "clustered data". Examples of clustered data include repeated measures or hierarchical shared association (e.g., individuals within families).This paper provides an overview of the R package *htestClust*, a tool for the marginal analysis of such clustered data with potentially informative cluster and/or group sizes. Contained in *htestClust* are clustered data analogues to the following classical hypothesis tests: rank-sum, signed rank, *t*-, one-way ANOVA, F, Levene, Pearson/Spearman/Kendall correlation, proportion, goodness-of-fit, independence, and McNemar. Additional functions allow users to visualize and test for informative cluster size. This package has an easy-to-use interface mimicking that of classical hypothesis-testing functions in the R environment. Various features of this package are illustrated through simple examples.
+
+# Introduction
+Observations often occur or can be organized into units called clusters, within which those observations may be dependent. For example, individuals may be repeatedly assessed or naturally belong to some hierarchical structure like a family unit. Potential correlation among intra-cluster observations clearly invalidates the use of classical hypothesis tests for the analysis of such data. Instead, inference is generally performed using model-based methods that capture intracluster relationships through parametric or semi-parametric assumptions. Generalized estimating equations (GEEs) are one such approach that fit marginal generalized linear models to clustered data while making a working assumption on the correlation structure. GEE models are appealing for their flexible and robust nature, and several packages in the R environment, such as *gee* [@carey19] and *geepack* [@halekoh06], offer an implementation of this method. However, GEEs and other standard methods for analysis of clustered data operate under an assumption that the number of observations within the clusters (defined as the cluster size) is ignorable. In practice, this assumption may not hold and cluster size may vary systematically in a way that carries information related to the response of interest. When this occurs data are said to have informative cluster size (ICS). Examples of ICS can be found in data related to dental health [@williamson03], pregnancy studies [@chaurasia18], and longitudinal rehabilitation [@lorenz11], among others. For data with ICS, standard model-based methods can produce biased inference as their estimates may be overweighted in favor of larger clusters.
+
+A related but distinct type of informativeness occurs when the distribution of group-defining covariates varies in a way that carries information on the response. Such phenomenon has been called informative within-cluster group size (IWCGS), as well as informative covariate structure [@pavlou12], sub-cluster covariate informativeness [@lorenz18], and informative intra-cluster group size [@dutta16]. This additional informativeness may occur simultaneously with or separately from ICS, and similarly can result in the failure of standard methods to maintain appropriate nominal size [@huang11; @dutta16].
+
+@williamson03 developed a reweighting methodology that corrects for potential bias from cluster- or group-size informativeness. This reweighting originates from a Monte Carlo resampling process, and leads to weighting observations proportional to their inverse cluster or within-cluster group size. Correction for ICS/IWCGS was originally proposed in the context of modeling, and a number of extensions to this application have been established [@bible16; @iosif14; @mitani19; @mitani20]. However, when adjustment for covariates is not of interest, this reweighting can be directly applied in the estimation of marginal parameters. Under mild conditions, such estimates are asymptotically normal, permitting Wald-type intervals and tests. This methodology has been applied to develop rank-based tests [@datta05, datta08, dutta16], and tests of correlation [@lorenz11], proportions [@gregg20], means and variances [@greggdis20]. This collection of reweighted non-model-based hypothesis tests includes clustered data analogues of the following classical tests: rank-sum, signed rank, *t*-, one-way ANOVA, F, Levene, Pearson/Spearman/Kendall correlation, proportion, goodness-of-fit, independence, and McNemar.
+
+These clustered data analogues to standard hypothesis tests provide simple and intuitive means of performing exploratory and preliminary analysis of clustered data in which the cluster and/or group size varies and is potentially informative. However, many of these tests are recent developments that are not available in a software environment. We address this deficiency through the package *htestClust*, the first R package designed as a comprehensive collection of direct, non-model-based inferential methods for analysis of clustered data with potential ICS and/or IWCGS. Within *htestClust* are implimented the collection of methods by @datta05, @datta08, @dutta16, @lorenz11, @gregg20 and @greggdis20, as well as a method by @nevalainen17 that tests for the presence of informative cluster size. The syntax and output of functions contained in *htestClust* are intentionally modeled after their corresponding analogous classical function, allowing researchers to assess various marginal analyses through intuitive and user-friendly means. We point the interested reader to the original citations for details on the testing theory. The rest of this document is devoted to an overview of the *htestClust* package, with a description of the features and structure of the provided functions, along with various illustrations.
+
+# Overview of *htestClust*
+*htestClust* includes ten functions for conducting different hypothesis tests under ICS, one function for visualizing informativeness in cluster size, and a simulated hypothetical data set to illustrate the use of the functions. With the exception of the test of informative cluster size, each of the hypothesis testing functions implemented in *htestClust* has a well-known analogue test for i.i.d. data. Table 1 contains a summary of the hypothesis testing functions contained in *htestClust* and their analogue i.i.d. function. 
+
+
+| *htestClust* function | Reweighted test(s) | Classical analogue function |
+|:----------------------|:-------------------|:----------------------------|
+| *chisqtestClust()*    | Chi squared goodness of fit, independence |*chisq.test()*    | 
+| *cortestClust()*      | Correlation        												| *cor.test()*     |
+| *icstestClust()*      | Test of ICS																| NA	             |
+| *levenetestClust()*	  | *K*-group test of variance       					| *leveneTest()*   |
+| *mcnemartestClust()*	| Homogeneity																| *mcnemar.test()* | 
+| *onewaytestClust()*	  | *K*-group mean equality		     						| *oneway.test()*  |
+| *proptestClust()*		  | Proportion 									  						| *prop.test()*    |
+| *ttestClust()*				| Test of means (one/two group, paired)			| *t.test()*       |
+| *vartestClust()*			| 2-group test of variance       						| *var.test()*     |	
+| *wilcoxtestClust()*   | Rank sum, signed rank 										| *wilcox.test()*  |
+
+Table 1. Hypothesis testing functions available in the *htestClust* package. Each row gives the name of a *htestClust* function, the reweighted test the function performs, and the R function that executes the corresponding classical analogue test. All classical analogue functions are available in R through the *stats* package, except for *leveneTest()*, which is included in the *car* package.
+
+## Package functions, syntax, and output
+The syntax and output of the functions in *htestClust* are designed to conform with that of the analogous i.i.d. functions from the R *stats* library. A notable but necessary departure from this correspondence is that the *htestClust* functions require as input (1) a variable identifying the clusters as an argument in the data set or (2) a cluster-level summary of the data. As an example, consider the syntax for the *stats* and *htestClust* functions for conducting a test of a single proportion:
+```{r eval=FALSE}
+## syntax for *stats* function
+	prop.test(x, n, p = NULL, alternative = c("two.sided", "less", "greater"),
+	conf.level = 0.95, correct = TRUE)
+	
+## syntax for *htestClust* function
+	proptestClust(x, id, p = NULL, alternative = c("two.sided", "less",
+	"greater"), variance = c("sand.null", "sand.est", "emp", "MoM"),
+	conf.level = 0.95)
+```
+
+The *stats* library function *prop.test* does not operate on variables in a data frame, but instead takes summary counts as its input. Argument *x* can be a scalar representing the number of binomial successes, whence *n* is required as the number of binomial trials. Alternatively, *x* can be a one-dimensional table or matrix with two entries, whence *n* is omitted. The remaining arguments customize the test in ways familiar to most users.
+
+The function *proptestClust* from *htestClust* operates on binary variables in a data frame or on cluster-level summary counts. In this function, *x* may be a binary variable measured over clusters, wherein *id* is required as a vector of cluster identifiers. Alternatively, *x* may instead be a two-dimensional table of within-cluster counts of failures and successes, wherein *id* is omitted. As previously noted, several options are available for variance estimation; these may be selected by the user through the *variance* argument. Additional customization of the test is as in *prop.test*.
+
+Each of the testing functions in *htestClust* has been constructed in this vein -- parallel to the analogous *stats* function with contingencies necessary for clustered data. *htestClust* functions accept vector input that designates the response, grouping (if necessary), and clustering variables. However, for convenience, many functions are designed with a secondary interface accepting tables or formulas. Like their *stats* package analogues, *htestClust* testing functions produce *list* objects of class *htest* for which the *print* method behaves in the usual way.
+
+The function *icsPlot* provides a simple method for illustrating informative cluster size, providing a visual supplement to the results of the test of ICS, performed through the function *icstestClust*. Briefly, *icsPlot* plots a within-cluster summary statistic of a variable, such as a mean, against the size of each cluster. For quantitative variables, *icsPlot* produces a scatterplot of a within-cluster measure of location (mean, median) or variation (SD, variance, IQR, range) against cluster size. For a categorical variable, a barplot of within-cluster proportions is produced.
+
+## Simulated example data set
+*htestClust* includes a simulated data set named *screen8* of clustered observations with informativeness, created under a hypothetical scenario we briefly describe here. A large school district has conducted a voluntary comprehensive exit survey for students graduating elementary school, collecting demographic, biometric, and academic performance data. The clustering mechanism for these data are the schools, with students comprising the observations within clusters.
+
+The school district has offered an incentive program to boost participation, wherein schools having higher participation rates are rewarded with priority status for classroom and technology upgrades for the new academic year. This incentive introduces the potential for ICS -- resource-poor schools may exhibit greater participation (larger cluster sizes) but also tend to have students with poorer health metrics and standardized test scores. 
+
+*screen8* contains data from 2224 students from 73 schools in this district. Cluster sizes -- the number of students participating in the exit survey at each school -- ranged from 17 to 50, with a median of 30. The first few lines of the data are printed below, followed by the tabulated number of partcipants from each school and a summary of the cluster sizes.  
+
+```{r}
+library(htestClust)
+data(screen8)
+head(screen8)	
+	
+(tab <- table(screen8$sch.id)) 
+summary(as.vector(tab))
+```
+
+Table 2 provides details on the variables in the data set.
+
+|   Variable    |		           Description       |
+|:--------------|:-------------------------------|
+| *sch.id*	    | School identification variable |
+| *stud.id*	    | Student identification variable within school	 |
+| *age*	        | Student age in years	 |
+| *gender*	    | Student gender |
+| *height*	    | Student height in inches |
+| *weight*	    | Student weight in lbs |
+| *math*	      | Student score on standardized math test |
+| *read*	      | Student score on standardized reading test |
+| *phq2*	      | Ordinal (0-6) score from a mental health screening. Higher scores correspond to higher levels of depression |
+| *qfit*	      | Age-adjusted fitness quartile from physical health assessment taken at end of school year |
+| *qfit.s*	    | Age-adjusted fitness quartile from physical health assessment taken at beginning of school year |
+| *activity*    | Student after-school activity |
+																	
+Table 2. Variables in *screen8* data set. Each row gives the name of a variable included in the *screen8* data set and its associated description.
+
+# Examples
+In this section, we demonstrate usage of the functions in *htestClust* using the *screen8* data set. Our illustration is not comprehensive, but users can learn more about functions not covered here by browsing the associated help files. To motivate the demonstration, we'll investigate the following questions:
+
+1. Is the proportion of students having ``proficient'' standardized math test scores (65 or greater) more than 0.75?
+1. Are participation in extracurricular activity and gender independent?
+1. Are mean standardized math test scores different between male and female students?
+1. Are mean standardized reading test scores different among groups defined by extracurricular activities?
+
+## Evaluating informative cluster size
+Before addressing these questions, we illustrate how to assess the potential informativeness of cluster size in the data set, starting by visualizing ICS through the *icsPlot* function. The arguments to *icsPlot* specify the variable of interest, a cluster-identifying variable, and a summary function to be applied to the variable within each cluster. This summary can be any of *obs*, *mean*, *median*, *var*, *IQR*, *range*, *prop*, producing plots of the observations themselves, measure of location, or measures of variation against cluster size. Option *prop* can only be used when the variable of interest is a factor, so numerically coded categorical variables must be converted to factors. Standard R graphical parameters can also be specified when calling *icsPlot()*.
+```{r, fig.width = 7, fig.height = 4}
+### Figure 1
+par(mfrow = c(1,2))
+icsPlot(x = screen8$math, id = screen8$sch.id, FUN = "mean", pch = 20)
+icsPlot(x = screen8$read, id = screen8$sch.id, FUN = "mean", pch = 20)
+```
+```{r, fig.width = 7, fig.height = 4}
+### Figure 2
+par(mfrow = c(1,2))
+icsPlot(x = screen8$gender, id = screen8$sch.id, FUN = "prop", ylab = "P(Female)", pch = 20)
+icsPlot(x = screen8$activity, id = screen8$sch.id, FUN = "prop")
+```
+Figures 1 and 2 show potential informativeness in cluster size for the *screen8* data. Cluster size appears to be negatively associated with average standardized test scores but positively associated with the proportion of male students and the proportion participating in sports-related extracurricular activities.
+
+These empirical results can be verified using the test for ICS, implemented through the function *icstestClust*, as illustrated below. The result of this test suggests that cluster size is informative for standardized math test scores. Cluster size is also informative for standardized reading test scores, gender, and sports as an extracurricular activity (*p* < .001, results not shown). 
+```{r eval=FALSE}	
+## example code to perform test for ICS (not run due to computational time)
+set.seed(100)
+ics.math <- icstestClust(screen8$math, screen8$sch.id, B = 1000, print.it = FALSE)
+	
+ics.math
+Test of informative cluster size (TF)
+data:  screen8$math
+TF = 0.029686, p-value < 2.2e-16
+```
+Within the *icstestClust* function, the type of test statistic, TF or TCM, is specified using the *test.method* argument. It is suggested to use TCM when there is a small number of distinct cluster sizes, as it tends to be more powerful. TF is preferred when the number of distinct cluster sizes is large and the number of clusters with those sizes is small, as TCM tends to be too liberal. Readers are pointed to @nevalainen17 for more details. The number of bootstrap loops is specified by argument *B*, while argument *print.it* is a logical indicating whether to print the progress of the bootstrap procedure. We note that the need for bootstrap resampling in *icstestClust* can make its implementation computationally expensive.
+
+## Testing a marginal proportion
+
+The first question of interest suggests a one-sample test of a proportion via *proptestClust*. We specify a one-sided alternative and use the default sandwich variance estimator evaluated at the null value of the proportion (*variance = "sand.null"*), shown to perform best for this test [@gregg20].
+```{r}	
+screen8$math.p <- 1*(screen8$math >= 65)
+proptestClust(screen8$math.p, screen8$sch.id, p = .75, alternative = "great")
+```
+As noted previously, *htestClust* functions produce objects of class *htest*, producing familiar output through the *print* method for such objects. We conclude that the proportion of students with proficient math test scores is not greater than 0.75.
+
+## Independence test
+The second question suggests a test of independence of extracurricular activity and gender. We start by producing cluster-weighted estimates of the proportion of students participating in each activity within each gender.
+```{r}	
+tab <- table(screen8$gender, screen8$activity, screen8$sch.id) 
+ptab <- prop.table(tab, c(1,3))
+apply(ptab, c(1,2), mean)
+```
+The cluster-weighted proportions appear roughly similar, and we can test using *chisqtestClust*. Here, the default method of variance estimation is method of moments (*variance = "MoM"*), demonstrated to be best for the test of independence [@gregg20].
+```{r}
+chisqtestClust(screen8$gender, screen8$activity, screen8$sch.id)
+```
+Before proceeding to the next analysis, we note that further evidence of ICS in the *screen8* data can be demonstrated by implementing the standard chi-squared test for this question, which suggests that females were more likely to participate in academic extracurricular activities and males in sports.
+```{r}	
+prop.table(table(screen8$gender, screen8$activity), 1)
+```
+## Tests of quantitative variables for two or more groups
+
+We compare math test scores between males and females using the *ttestClust* function. We conclude that mean standardized test scores are equivalent between males and females, a departure from the conclusion reached by the standard *t* test (p < .001, results not shown). 
+```{r}	
+ttestClust(math ~ gender, id = sch.id, data = screen8)
+```	
+Even though this test does not make use of the $t$ distribution, we have named it as such to parallel the standard $t$-test means (*t.test* in R). Multi-group tests of quantitative parameters in *htestClust* necessarily implement jackknife variance estimation, so specification of variance estimation method is not necessary. In addition to the formula implementation used above, we note that *ttestClust* can also accept vectors of data and cluster identifiers for each of the two groups. 
+
+An alternative approach to this comparison, particularly if test scores were skewed in any way, would be a rank-based test. *wilcoxtestClust* implements the group-weighted analogue of the Wilcoxon test, which we use as an alternative method for the comparison of math test scores between males and females.
+```{r eval=FALSE}	
+## code to run group-weighted Wilcoxon test analogue (not run due to computational time)
+wilcoxtestClust(math ~ gender, id = sch.id, data = screen8, method = "group")
+```
+Our conclusion is the same as with the reweighted test of means. We note that this test requires estimation of the cluster-weighted empirical cumulative distribution [@dutta16] as well as jackknife variance estimation, so there is an added measure of computational expense in using *wilcoxtestClust*.
+
+Finally, we compare reading test scores among the three groups defined by extracurricular activity, using *onewaytestClust*. Mean standardized reading test scores are not appreciably different among extracurricular activity groups.
+```{r}	
+onewaytestClust(read ~ activity, id = sch.id, data = screen8)
+```
+
+# Discussion
+Standard model-based inference of clustered data can be biased when cluster or group size is informative. Reweighting methods that correct for this bias have been established and a number of authors have applied such weighting to develop direct hypothesis tests of marginal parameters in clustered data. Such tests can be interpreted as clustered analogues to common classical statistical tests, and include methods related to ranks, correlation, proportions, means and variances. While these methods are effective and intuitive, all but a few of these tests have remained inaccessible to many researchers due to an absence of convenient software.
+
+In this vignette we summarized *htestClust*, which is the first R package designed as a comprehensive library of inferential methods appropriate for clustered data with ICS/IWCGS. Most functions in *htestClust* perform hypothesis tests for clustered data that have an analogous classical form, and the interface of the package has been designed to reflect this relationship. Function syntax has been purposefully structured to resemble that of functions available in the native R environment that perform the analogous classical tests. Many functions have been designed with a secondary interface that operates through table or formula input, allowing flexibility in data structure. In addition to the hypothesis tests of marginal parameters, *htestClust* also includes functions to visualize potential informativeness and test for ICS. These tools allow analysts to explore the effect and degree of informativeness in their data. 
+
+With the exception of the test for ICS, the hypothesis tests performed by *htestClust* are derived through the asymptotic normality of reweighted parameters, and their asymptotic convergence is indexed by the number of clusters. As such, their use should only be considered when the number of clusters is sufficiently large (at least 30). Additionally, these methods retain a cluster-based marginal interpretation, making them appropriate when clusters, rather than intra-cluster observations, are the unit of interest. The marginal nature of these tests provides researchers with an analysis corresponding to a snapshot in time. If analysis of temporal aspects or effects of additional covariates is desired, readers might instead consider reweighted model-based methods such as those by @bible16, @neuhaus11, and @wang11. 
+
+*htestClust* is a tool to facilitate the analysis of clustered data, and we have designed its use to be accessible and intuitive. While we have not shown the full functionality of all of the *htestClust* functions, the syntax and usage is similar and fully documented with examples in the help files. While the inferntial methods performed by this package have been developed to correct for the biasing effects of ICS/IWCGS, they remain applicable when fluctuations of cluster or group size are unrelated to the outcome of interest. As such, this package is an effective resource for researchers addressing marginal analyses in clustered data with any variation in the cluster and/or group sizes.
+
+
+# Citations

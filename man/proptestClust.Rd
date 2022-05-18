@@ -65,6 +65,14 @@ proptestClust(screen8$math.p, screen8$sch.id, p = .75, alternative = "great")
 mathp.tab <- table(screen8$sch.id, screen8$math.p)
 proptestClust(mathp.tab, variance="emp", p=.75)
 
+## when all clusters have a size of 1, results will be in general correspondence with
+## that of the classical analogue test
+set.seed(123)
+x <- rbinom(100, size = 1, p = 0.7)
+id <- 1:100
+proptestClust(x, id)
+prop.test(sum(x), length(x))
+
 }
 \references{
 Gregg, M., Datta, S., Lorenz, D. (2020) Variance Estimation in Tests of Clustered Categorical Data

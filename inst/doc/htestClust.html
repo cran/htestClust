@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<meta name="author" content="Mary Gregg, Somnath Datta, Douglas Lorenz" />
+
+
+<title>htestClust: a package for marginal inference of clustered data under informative cluster size</title>
+
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+
+
+<style type="text/css">
+  code {
+    white-space: pre;
+  }
+  .sourceCode {
+    overflow: visible;
+  }
+</style>
+<style type="text/css" data-origin="pandoc">
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; left: -4em; }
+pre.numberSource a.sourceLine::before
+  { content: attr(title);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    for (var j = 0; j < rules.length; j++) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore"><em>htestClust</em>: a package for marginal inference of clustered data under informative cluster size</h1>
+<h4 class="author">Mary Gregg, Somnath Datta, Douglas Lorenz</h4>
+
+
+
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" title="1"><span class="kw">library</span>(htestClust)</a></code></pre></div>
+<p><strong>Note:</strong> This document is abridged from a longer article published in <em>R Journal</em>.</p>
+<div id="abstract" class="section level1">
+<h1>Abstract</h1>
+<p>When observations are collected in/organized into observation units, within which observations may be dependent, those observational units are often referred to as “clusters” and the data as “clustered data”. Examples of clustered data include repeated measures or hierarchical shared association (e.g., individuals within families).This paper provides an overview of the R package <em>htestClust</em>, a tool for the marginal analysis of such clustered data with potentially informative cluster and/or group sizes. Contained in <em>htestClust</em> are clustered data analogues to the following classical hypothesis tests: rank-sum, signed rank, <em>t</em>-, one-way ANOVA, F, Levene, Pearson/Spearman/Kendall correlation, proportion, goodness-of-fit, independence, and McNemar. Additional functions allow users to visualize and test for informative cluster size. This package has an easy-to-use interface mimicking that of classical hypothesis-testing functions in the R environment. Various features of this package are illustrated through simple examples.</p>
+</div>
+<div id="introduction" class="section level1">
+<h1>Introduction</h1>
+<p>Observations often occur or can be organized into units called clusters, within which those observations may be dependent. For example, individuals may be repeatedly assessed or naturally belong to some hierarchical structure like a family unit. Potential correlation among intra-cluster observations clearly invalidates the use of classical hypothesis tests for the analysis of such data. Instead, inference is generally performed using model-based methods that capture intracluster relationships through parametric or semi-parametric assumptions. Generalized estimating equations (GEEs) are one such approach that fit marginal generalized linear models to clustered data while making a working assumption on the correlation structure. GEE models are appealing for their flexible and robust nature, and several packages in the R environment, such as <em>gee</em> <span class="citation">(Carey, Lumley, and Ripley <a href="#ref-carey19" role="doc-biblioref">2019</a>)</span> and <em>geepack</em> <span class="citation">(Halekoh et al. <a href="#ref-halekoh06" role="doc-biblioref">2006</a>)</span>, offer an implementation of this method. However, GEEs and other standard methods for analysis of clustered data operate under an assumption that the number of observations within the clusters (defined as the cluster size) is ignorable. In practice, this assumption may not hold and cluster size may vary systematically in a way that carries information related to the response of interest. When this occurs data are said to have informative cluster size (ICS). Examples of ICS can be found in data related to dental health <span class="citation">(Williamson, Datta, and Satten <a href="#ref-williamson03" role="doc-biblioref">2003</a>)</span>, pregnancy studies <span class="citation">(Chaurasia, Liu, and Albert <a href="#ref-chaurasia18" role="doc-biblioref">2018</a>)</span>, and longitudinal rehabilitation <span class="citation">(Lorenz, Datta, and Harkema <a href="#ref-lorenz11" role="doc-biblioref">2011</a>)</span>, among others. For data with ICS, standard model-based methods can produce biased inference as their estimates may be overweighted in favor of larger clusters.</p>
+<p>A related but distinct type of informativeness occurs when the distribution of group-defining covariates varies in a way that carries information on the response. Such phenomenon has been called informative within-cluster group size (IWCGS), as well as informative covariate structure <span class="citation">(Pavlou <a href="#ref-pavlou12" role="doc-biblioref">2012</a>)</span>, sub-cluster covariate informativeness <span class="citation">(Lorenz, Levy, and Datta <a href="#ref-lorenz18" role="doc-biblioref">2018</a>)</span>, and informative intra-cluster group size <span class="citation">(Dutta and Datta <a href="#ref-dutta16" role="doc-biblioref">2016</a>)</span>. This additional informativeness may occur simultaneously with or separately from ICS, and similarly can result in the failure of standard methods to maintain appropriate nominal size <span class="citation">(Huang and Leroux <a href="#ref-huang11" role="doc-biblioref">2011</a>; Dutta and Datta <a href="#ref-dutta16" role="doc-biblioref">2016</a>)</span>.</p>
+<p><span class="citation">Williamson, Datta, and Satten (<a href="#ref-williamson03" role="doc-biblioref">2003</a>)</span> developed a reweighting methodology that corrects for potential bias from cluster- or group-size informativeness. This reweighting originates from a Monte Carlo resampling process, and leads to weighting observations proportional to their inverse cluster or within-cluster group size. Correction for ICS/IWCGS was originally proposed in the context of modeling, and a number of extensions to this application have been established <span class="citation">(Bible, Beck, and Datta <a href="#ref-bible16" role="doc-biblioref">2016</a>; Iosif and Sampson <a href="#ref-iosif14" role="doc-biblioref">2014</a>; Mitani, Kaye, and Nelson <a href="#ref-mitani19" role="doc-biblioref">2019</a>, <a href="#ref-mitani20" role="doc-biblioref">2020</a>)</span>. However, when adjustment for covariates is not of interest, this reweighting can be directly applied in the estimation of marginal parameters. Under mild conditions, such estimates are asymptotically normal, permitting Wald-type intervals and tests. This methodology has been applied to develop rank-based tests <span class="citation">(Datta and Satten <a href="#ref-datta05" role="doc-biblioref">2005</a>, datta08, dutta16)</span>, and tests of correlation <span class="citation">(Lorenz, Datta, and Harkema <a href="#ref-lorenz11" role="doc-biblioref">2011</a>)</span>, proportions <span class="citation">(Gregg, Datta, and Lorenz <a href="#ref-gregg20" role="doc-biblioref">2020</a>)</span>, means and variances <span class="citation">(Gregg <a href="#ref-greggdis20" role="doc-biblioref">2020</a>)</span>. This collection of reweighted non-model-based hypothesis tests includes clustered data analogues of the following classical tests: rank-sum, signed rank, <em>t</em>-, one-way ANOVA, F, Levene, Pearson/Spearman/Kendall correlation, proportion, goodness-of-fit, independence, and McNemar.</p>
+<p>These clustered data analogues to standard hypothesis tests provide simple and intuitive means of performing exploratory and preliminary analysis of clustered data in which the cluster and/or group size varies and is potentially informative. However, many of these tests are recent developments that are not available in a software environment. We address this deficiency through the package <em>htestClust</em>, the first R package designed as a comprehensive collection of direct, non-model-based inferential methods for analysis of clustered data with potential ICS and/or IWCGS. Within <em>htestClust</em> are implimented the collection of methods by <span class="citation">Datta and Satten (<a href="#ref-datta05" role="doc-biblioref">2005</a>)</span>, <span class="citation">Datta and Satten (<a href="#ref-datta08" role="doc-biblioref">2008</a>)</span>, <span class="citation">Dutta and Datta (<a href="#ref-dutta16" role="doc-biblioref">2016</a>)</span>, <span class="citation">Lorenz, Datta, and Harkema (<a href="#ref-lorenz11" role="doc-biblioref">2011</a>)</span>, <span class="citation">Gregg, Datta, and Lorenz (<a href="#ref-gregg20" role="doc-biblioref">2020</a>)</span> and <span class="citation">Gregg (<a href="#ref-greggdis20" role="doc-biblioref">2020</a>)</span>, as well as a method by <span class="citation">Nevalainen, Oja, and Datta (<a href="#ref-nevalainen17" role="doc-biblioref">2017</a>)</span> that tests for the presence of informative cluster size. The syntax and output of functions contained in <em>htestClust</em> are intentionally modeled after their corresponding analogous classical function, allowing researchers to assess various marginal analyses through intuitive and user-friendly means. We point the interested reader to the original citations for details on the testing theory. The rest of this document is devoted to an overview of the <em>htestClust</em> package, with a description of the features and structure of the provided functions, along with various illustrations.</p>
+</div>
+<div id="overview-of-htestclust" class="section level1">
+<h1>Overview of <em>htestClust</em></h1>
+<p><em>htestClust</em> includes ten functions for conducting different hypothesis tests under ICS, one function for visualizing informativeness in cluster size, and a simulated hypothetical data set to illustrate the use of the functions. With the exception of the test of informative cluster size, each of the hypothesis testing functions implemented in <em>htestClust</em> has a well-known analogue test for i.i.d. data. Table 1 contains a summary of the hypothesis testing functions contained in <em>htestClust</em> and their analogue i.i.d. function.</p>
+<table>
+<thead>
+<tr class="header">
+<th align="left"><em>htestClust</em> function</th>
+<th align="left">Reweighted test(s)</th>
+<th align="left">Classical analogue function</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left"><em>chisqtestClust()</em></td>
+<td align="left">Chi squared goodness of fit, independence</td>
+<td align="left"><em>chisq.test()</em></td>
+</tr>
+<tr class="even">
+<td align="left"><em>cortestClust()</em></td>
+<td align="left">Correlation</td>
+<td align="left"><em>cor.test()</em></td>
+</tr>
+<tr class="odd">
+<td align="left"><em>icstestClust()</em></td>
+<td align="left">Test of ICS</td>
+<td align="left">NA</td>
+</tr>
+<tr class="even">
+<td align="left"><em>levenetestClust()</em></td>
+<td align="left"><em>K</em>-group test of variance</td>
+<td align="left"><em>leveneTest()</em></td>
+</tr>
+<tr class="odd">
+<td align="left"><em>mcnemartestClust()</em></td>
+<td align="left">Homogeneity</td>
+<td align="left"><em>mcnemar.test()</em></td>
+</tr>
+<tr class="even">
+<td align="left"><em>onewaytestClust()</em></td>
+<td align="left"><em>K</em>-group mean equality</td>
+<td align="left"><em>oneway.test()</em></td>
+</tr>
+<tr class="odd">
+<td align="left"><em>proptestClust()</em></td>
+<td align="left">Proportion</td>
+<td align="left"><em>prop.test()</em></td>
+</tr>
+<tr class="even">
+<td align="left"><em>ttestClust()</em></td>
+<td align="left">Test of means (one/two group, paired)</td>
+<td align="left"><em>t.test()</em></td>
+</tr>
+<tr class="odd">
+<td align="left"><em>vartestClust()</em></td>
+<td align="left">2-group test of variance</td>
+<td align="left"><em>var.test()</em></td>
+</tr>
+<tr class="even">
+<td align="left"><em>wilcoxtestClust()</em></td>
+<td align="left">Rank sum, signed rank</td>
+<td align="left"><em>wilcox.test()</em></td>
+</tr>
+</tbody>
+</table>
+<p>Table 1. Hypothesis testing functions available in the <em>htestClust</em> package. Each row gives the name of a <em>htestClust</em> function, the reweighted test the function performs, and the R function that executes the corresponding classical analogue test. All classical analogue functions are available in R through the <em>stats</em> package, except for <em>leveneTest()</em>, which is included in the <em>car</em> package.</p>
+<div id="package-functions-syntax-and-output" class="section level2">
+<h2>Package functions, syntax, and output</h2>
+<p>The syntax and output of the functions in <em>htestClust</em> are designed to conform with that of the analogous i.i.d. functions from the R <em>stats</em> library. A notable but necessary departure from this correspondence is that the <em>htestClust</em> functions require as input (1) a variable identifying the clusters as an argument in the data set or (2) a cluster-level summary of the data. As an example, consider the syntax for the <em>stats</em> and <em>htestClust</em> functions for conducting a test of a single proportion:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" title="1"><span class="co">## syntax for *stats* function</span></a>
+<a class="sourceLine" id="cb2-2" title="2">    <span class="kw">prop.test</span>(x, n, <span class="dt">p =</span> <span class="ot">NULL</span>, <span class="dt">alternative =</span> <span class="kw">c</span>(<span class="st">&quot;two.sided&quot;</span>, <span class="st">&quot;less&quot;</span>, <span class="st">&quot;greater&quot;</span>),</a>
+<a class="sourceLine" id="cb2-3" title="3">    <span class="dt">conf.level =</span> <span class="fl">0.95</span>, <span class="dt">correct =</span> <span class="ot">TRUE</span>)</a>
+<a class="sourceLine" id="cb2-4" title="4">    </a>
+<a class="sourceLine" id="cb2-5" title="5"><span class="co">## syntax for *htestClust* function</span></a>
+<a class="sourceLine" id="cb2-6" title="6">    <span class="kw">proptestClust</span>(x, id, <span class="dt">p =</span> <span class="ot">NULL</span>, <span class="dt">alternative =</span> <span class="kw">c</span>(<span class="st">&quot;two.sided&quot;</span>, <span class="st">&quot;less&quot;</span>,</a>
+<a class="sourceLine" id="cb2-7" title="7">    <span class="st">&quot;greater&quot;</span>), <span class="dt">variance =</span> <span class="kw">c</span>(<span class="st">&quot;sand.null&quot;</span>, <span class="st">&quot;sand.est&quot;</span>, <span class="st">&quot;emp&quot;</span>, <span class="st">&quot;MoM&quot;</span>),</a>
+<a class="sourceLine" id="cb2-8" title="8">    <span class="dt">conf.level =</span> <span class="fl">0.95</span>)</a></code></pre></div>
+<p>The <em>stats</em> library function <em>prop.test</em> does not operate on variables in a data frame, but instead takes summary counts as its input. Argument <em>x</em> can be a scalar representing the number of binomial successes, whence <em>n</em> is required as the number of binomial trials. Alternatively, <em>x</em> can be a one-dimensional table or matrix with two entries, whence <em>n</em> is omitted. The remaining arguments customize the test in ways familiar to most users.</p>
+<p>The function <em>proptestClust</em> from <em>htestClust</em> operates on binary variables in a data frame or on cluster-level summary counts. In this function, <em>x</em> may be a binary variable measured over clusters, wherein <em>id</em> is required as a vector of cluster identifiers. Alternatively, <em>x</em> may instead be a two-dimensional table of within-cluster counts of failures and successes, wherein <em>id</em> is omitted. As previously noted, several options are available for variance estimation; these may be selected by the user through the <em>variance</em> argument. Additional customization of the test is as in <em>prop.test</em>.</p>
+<p>Each of the testing functions in <em>htestClust</em> has been constructed in this vein – parallel to the analogous <em>stats</em> function with contingencies necessary for clustered data. <em>htestClust</em> functions accept vector input that designates the response, grouping (if necessary), and clustering variables. However, for convenience, many functions are designed with a secondary interface accepting tables or formulas. Like their <em>stats</em> package analogues, <em>htestClust</em> testing functions produce <em>list</em> objects of class <em>htest</em> for which the <em>print</em> method behaves in the usual way.</p>
+<p>The function <em>icsPlot</em> provides a simple method for illustrating informative cluster size, providing a visual supplement to the results of the test of ICS, performed through the function <em>icstestClust</em>. Briefly, <em>icsPlot</em> plots a within-cluster summary statistic of a variable, such as a mean, against the size of each cluster. For quantitative variables, <em>icsPlot</em> produces a scatterplot of a within-cluster measure of location (mean, median) or variation (SD, variance, IQR, range) against cluster size. For a categorical variable, a barplot of within-cluster proportions is produced.</p>
+</div>
+<div id="simulated-example-data-set" class="section level2">
+<h2>Simulated example data set</h2>
+<p><em>htestClust</em> includes a simulated data set named <em>screen8</em> of clustered observations with informativeness, created under a hypothetical scenario we briefly describe here. A large school district has conducted a voluntary comprehensive exit survey for students graduating elementary school, collecting demographic, biometric, and academic performance data. The clustering mechanism for these data are the schools, with students comprising the observations within clusters.</p>
+<p>The school district has offered an incentive program to boost participation, wherein schools having higher participation rates are rewarded with priority status for classroom and technology upgrades for the new academic year. This incentive introduces the potential for ICS – resource-poor schools may exhibit greater participation (larger cluster sizes) but also tend to have students with poorer health metrics and standardized test scores.</p>
+<p><em>screen8</em> contains data from 2224 students from 73 schools in this district. Cluster sizes – the number of students participating in the exit survey at each school – ranged from 17 to 50, with a median of 30. The first few lines of the data are printed below, followed by the tabulated number of partcipants from each school and a summary of the cluster sizes.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" title="1"><span class="kw">library</span>(htestClust)</a>
+<a class="sourceLine" id="cb3-2" title="2"><span class="kw">data</span>(screen8)</a>
+<a class="sourceLine" id="cb3-3" title="3"><span class="kw">head</span>(screen8)   </a>
+<a class="sourceLine" id="cb3-4" title="4"><span class="co">#&gt;   sch.id stud.id age gender height weight math read phq2 qfit qfit.s activity</span></a>
+<a class="sourceLine" id="cb3-5" title="5"><span class="co">#&gt; 1      1       1  15      M     65    136   69   75    3   Q2     Q2    other</span></a>
+<a class="sourceLine" id="cb3-6" title="6"><span class="co">#&gt; 2      1       2  14      M     66    135   80   57    2   Q4     Q3    other</span></a>
+<a class="sourceLine" id="cb3-7" title="7"><span class="co">#&gt; 3      1       3  15      M     65    146   60   85    0   Q2     Q3   sports</span></a>
+<a class="sourceLine" id="cb3-8" title="8"><span class="co">#&gt; 4      1       4  15      M     68    156   70   83    1   Q3     Q2    other</span></a>
+<a class="sourceLine" id="cb3-9" title="9"><span class="co">#&gt; 5      1       5  15      M     68    170   66   60    1   Q2     Q2   sports</span></a>
+<a class="sourceLine" id="cb3-10" title="10"><span class="co">#&gt; 6      1       6  14      M     63    109   84   62    0   Q1     Q1 academic</span></a>
+<a class="sourceLine" id="cb3-11" title="11">    </a>
+<a class="sourceLine" id="cb3-12" title="12">(tab &lt;-<span class="st"> </span><span class="kw">table</span>(screen8<span class="op">$</span>sch.id)) </a>
+<a class="sourceLine" id="cb3-13" title="13"><span class="co">#&gt; </span></a>
+<a class="sourceLine" id="cb3-14" title="14"><span class="co">#&gt;  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 </span></a>
+<a class="sourceLine" id="cb3-15" title="15"><span class="co">#&gt; 35 32 26 33 23 25 27 21 39 28 32 38 35 24 29 27 36 29 38 39 25 30 36 29 46 27 </span></a>
+<a class="sourceLine" id="cb3-16" title="16"><span class="co">#&gt; 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 </span></a>
+<a class="sourceLine" id="cb3-17" title="17"><span class="co">#&gt; 30 26 28 40 50 40 28 38 40 25 30 34 18 24 30 21 30 31 23 18 44 29 34 39 23 41 </span></a>
+<a class="sourceLine" id="cb3-18" title="18"><span class="co">#&gt; 53 54 55 56 57 58 59 60 61 62 63 64 65 66 67 68 69 70 71 72 73 </span></a>
+<a class="sourceLine" id="cb3-19" title="19"><span class="co">#&gt; 31 31 40 41 28 20 24 24 22 17 32 21 21 35 34 27 37 27 36 18 35</span></a>
+<a class="sourceLine" id="cb3-20" title="20"><span class="kw">summary</span>(<span class="kw">as.vector</span>(tab))</a>
+<a class="sourceLine" id="cb3-21" title="21"><span class="co">#&gt;    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. </span></a>
+<a class="sourceLine" id="cb3-22" title="22"><span class="co">#&gt;   17.00   25.00   30.00   30.47   36.00   50.00</span></a></code></pre></div>
+<p>Table 2 provides details on the variables in the data set.</p>
+<table>
+<colgroup>
+<col width="31%"></col>
+<col width="68%"></col>
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">Variable</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left"><em>sch.id</em></td>
+<td align="left">School identification variable</td>
+</tr>
+<tr class="even">
+<td align="left"><em>stud.id</em></td>
+<td align="left">Student identification variable within school</td>
+</tr>
+<tr class="odd">
+<td align="left"><em>age</em></td>
+<td align="left">Student age in years</td>
+</tr>
+<tr class="even">
+<td align="left"><em>gender</em></td>
+<td align="left">Student gender</td>
+</tr>
+<tr class="odd">
+<td align="left"><em>height</em></td>
+<td align="left">Student height in inches</td>
+</tr>
+<tr class="even">
+<td align="left"><em>weight</em></td>
+<td align="left">Student weight in lbs</td>
+</tr>
+<tr class="odd">
+<td align="left"><em>math</em></td>
+<td align="left">Student score on standardized math test</td>
+</tr>
+<tr class="even">
+<td align="left"><em>read</em></td>
+<td align="left">Student score on standardized reading test</td>
+</tr>
+<tr class="odd">
+<td align="left"><em>phq2</em></td>
+<td align="left">Ordinal (0-6) score from a mental health screening. Higher scores correspond to higher levels of depression</td>
+</tr>
+<tr class="even">
+<td align="left"><em>qfit</em></td>
+<td align="left">Age-adjusted fitness quartile from physical health assessment taken at end of school year</td>
+</tr>
+<tr class="odd">
+<td align="left"><em>qfit.s</em></td>
+<td align="left">Age-adjusted fitness quartile from physical health assessment taken at beginning of school year</td>
+</tr>
+<tr class="even">
+<td align="left"><em>activity</em></td>
+<td align="left">Student after-school activity</td>
+</tr>
+</tbody>
+</table>
+<p>Table 2. Variables in <em>screen8</em> data set. Each row gives the name of a variable included in the <em>screen8</em> data set and its associated description.</p>
+</div>
+</div>
+<div id="examples" class="section level1">
+<h1>Examples</h1>
+<p>In this section, we demonstrate usage of the functions in <em>htestClust</em> using the <em>screen8</em> data set. Our illustration is not comprehensive, but users can learn more about functions not covered here by browsing the associated help files. To motivate the demonstration, we’ll investigate the following questions:</p>
+<ol style="list-style-type: decimal">
+<li>Is the proportion of students having ``proficient’’ standardized math test scores (65 or greater) more than 0.75?</li>
+<li>Are participation in extracurricular activity and gender independent?</li>
+<li>Are mean standardized math test scores different between male and female students?</li>
+<li>Are mean standardized reading test scores different among groups defined by extracurricular activities?</li>
+</ol>
+<div id="evaluating-informative-cluster-size" class="section level2">
+<h2>Evaluating informative cluster size</h2>
+<p>Before addressing these questions, we illustrate how to assess the potential informativeness of cluster size in the data set, starting by visualizing ICS through the <em>icsPlot</em> function. The arguments to <em>icsPlot</em> specify the variable of interest, a cluster-identifying variable, and a summary function to be applied to the variable within each cluster. This summary can be any of <em>obs</em>, <em>mean</em>, <em>median</em>, <em>var</em>, <em>IQR</em>, <em>range</em>, <em>prop</em>, producing plots of the observations themselves, measure of location, or measures of variation against cluster size. Option <em>prop</em> can only be used when the variable of interest is a factor, so numerically coded categorical variables must be converted to factors. Standard R graphical parameters can also be specified when calling <em>icsPlot()</em>.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" title="1"><span class="co">### Figure 1</span></a>
+<a class="sourceLine" id="cb4-2" title="2"><span class="kw">par</span>(<span class="dt">mfrow =</span> <span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">2</span>))</a>
+<a class="sourceLine" id="cb4-3" title="3"><span class="kw">icsPlot</span>(<span class="dt">x =</span> screen8<span class="op">$</span>math, <span class="dt">id =</span> screen8<span class="op">$</span>sch.id, <span class="dt">FUN =</span> <span class="st">&quot;mean&quot;</span>, <span class="dt">pch =</span> <span class="dv">20</span>)</a>
+<a class="sourceLine" id="cb4-4" title="4"><span class="kw">icsPlot</span>(<span class="dt">x =</span> screen8<span class="op">$</span>read, <span class="dt">id =</span> screen8<span class="op">$</span>sch.id, <span class="dt">FUN =</span> <span class="st">&quot;mean&quot;</span>, <span class="dt">pch =</span> <span class="dv">20</span>)</a></code></pre></div>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" title="1"><span class="co">### Figure 2</span></a>
+<a class="sourceLine" id="cb5-2" title="2"><span class="kw">par</span>(<span class="dt">mfrow =</span> <span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">2</span>))</a>
+<a class="sourceLine" id="cb5-3" title="3"><span class="kw">icsPlot</span>(<span class="dt">x =</span> screen8<span class="op">$</span>gender, <span class="dt">id =</span> screen8<span class="op">$</span>sch.id, <span class="dt">FUN =</span> <span class="st">&quot;prop&quot;</span>, <span class="dt">ylab =</span> <span class="st">&quot;P(Female)&quot;</span>, <span class="dt">pch =</span> <span class="dv">20</span>)</a>
+<a class="sourceLine" id="cb5-4" title="4"><span class="kw">icsPlot</span>(<span class="dt">x =</span> screen8<span class="op">$</span>activity, <span class="dt">id =</span> screen8<span class="op">$</span>sch.id, <span class="dt">FUN =</span> <span class="st">&quot;prop&quot;</span>)</a></code></pre></div>
+<p><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAqAAAAGACAMAAABFpiBcAAAAclBMVEUAAAAAADoAAGYAOjoAOpAAZrY6AAA6ADo6AGY6Ojo6ZrY6kNtNTU1mAABmADpmAGZmkJBmtrZmtv+QOgCQZgCQkGaQtpCQ2/+urq62ZgC2Zjq225C2///bkDrb/7bb///m5ub/tmb/25D//7b//9v////aOhPlAAAACXBIWXMAAA7DAAAOwwHHb6hkAAAVsElEQVR4nO2di3qjuBmGnWns2Tbr2a7TbUo73qztcP+3WCQhDLYFv4SEPuHvfZ6dTQhCIL/WCR02NSHAbHLfACFjUFACDQUl0FBQAg0FJdBQUAINBSXQUFACDQUl0FBQAg0FJdBQUAINBSXQUFACDQUl0FBQAg0FJdBQUAINBSXQUFACDQUl0FBQAg0FJdBQUAINBSXQUFACDQUl0FBQAg0FJdBQUAINBSXQUFACDQUl0FBQAg0FJdBQUAINBSXQUFACDQUl0FBQAg0FJdBQUAINBSXQUFACDQUl0FBQAg0FJdBQUAINBSXQUFACDQUl0FBQAg0FJdBQUAINBSXQUFACDQUl0FBQAg0FJdBQUAINBSXQUFACDQUl0FBQAg0FJdBQUAINBSXQUNCcfL1vNN9+5r4TWChoRo6bN/PDyf5AbqGg+fh677Q8vn7mvBNgKGg+LvuD/fHEQt4BBc0Hc1ABFDQjx02bhbIO6oSC5uSyN6145p9OKCiBhoISaCgoBEe24h1EFnSzWuKmkzgZQ9I15MMI+gDn3Jw4KealZOLL4ZDpwToH/pJzlS1tmL9m3ZxvCkSCgqaJNsgBj0AUtHQoqDtQ0M35pkAkKGiaaIMc8AhEQUsnxYPZbnqFoxVPQRcWNKAZh0GS2/56n+pdoqDLChrU0QBBmrv+et/Kog1ywCMQBW3/TEGHnDaH0b9TUAoqg40kd6Cgm/NNgUgMLvdAxlL9XKGgXu9/4hGaApHoX67c7PIBKxQ0y/NQ0ERQ0DjPQ0ETQUHjPA+SoOVWOB9AQeM8D5Sga4KCxnkeCpoIChrneShoIihonOehoImgoHGeh4ImgoLGeR4KmggKGud5KGgiKGic56GgiaCgcZ6HgiaCgsZ5HgqaiLULOmvEkcfzUNBErF5Q51+mOI0Pub55nsSCVpvNVq+r7ropCpomWlxBe6vwSp4nraBqmdVqs1V35VjPkoKmiZaCStArAp9ePmr3isDxPkewoVBPLOh5p4vM8/d/Nz/ojOm00T9cfvyhq6yvn+0pgudJKqj+spjV1F1rqkf7HNEGkz6voOfdQU/uayQ8mEl+6p/Lftv812RTSgp7iuB5VpODUtBBtBkFtXnReadyz+aDN0vrNx7oip4SVL4FxFJ10N7y/36XE1v3HIKKG50ZBb3sjX46m1Remh+af3WJqv6xp0yD3or30A7LzzSCyhudGQWt2w/8/F0VnZ2gjZidoPWoE4NowPtB0fJFOSnu2qPKlFNQRdV4ORS0n4PaU6YfmYKmIsVdezQ60ws6/iapuVVTB60GddC+oKL+psUEda2pHq0Oisbac1A3+gZ1xtn8cNOKP5jaiT1l+mK5ctAZr3ELUTZtHXSy0ZlRUN3r2ch33v1z11Y0bT+ozjOrzetne8o06EX8gwCFFPprb8VPY6qeM6GgqVh7P+g0RQiqv+0b53rAFDRVtBRUxNHueerc/JR10DCmGp0AgkZhgVedhvSDRcBY9sHuGp3jSxre0F3l2QTt9XQlHyyCRu4i/j9ynldQ5qDZok0u6ERHfbTnSV0HbbPQ4DpoITXOe9LctrjRmV7QRxe44XTwHJ784HkSt+Ltzj6O/JOvOv2QNzoRBDXjlrAFnXs5CtrHo8pEQSPhvpw2k4L28Wh0ZhXUvNlU0zpe/9zb953HTTftw2Ove1xBWzVL9fOZc9D+2JDL/uWjPrb/qfFNetqHHHhBiyVRHVTa6Mwo6GB0nR5ZrYeC6oPffjqHWjueh4ImIs29ixudGQUdjE+2Q0DN2Do7aFkOrqDlFu6G1feDTgjazvDoBG17TFckaOE8u6APc9Dad90GCpqM1QvqfJN0Uwc9XOfLKSgoCGsXdIRrK/6tE1S34tU8OQoKwhMLamd4qMkdf3bz5I7mDS0FBeGZBY35PBQ0ERQ0zvNQ0ERQ0DjPAyJo4Z2eD6CgcZ4HQ9DSXxs9gILGeZ6nEXTpbwAFjfM8zyLo4nl0kYLK5tYt+jwYgqbP3yioRFDZaebcYHWdazI96iJFETQ5FDS2oL9eiSTow+cpQ9AIcrEOSkFDEF2uxEb+MwtabdrVzdTrze3NgZc/lKDtBJDz7vd988NZTwsxRbwN00ZDQRPxxIJW29qMDVH/qBEj3YHq28/6tOlNANFriB7VO/qjGmx/uIax0cwQtBuD6nuJx5cbO4mC+kabUdDLjw8zKNR61h0wI0WrdrsPNQFEr8Lc/nPopoj0owkV9LK3+fDXu88sPcfl7N3c3Y455OsngM/+NzC5KINPtJnroCe9i0JveTt9oF29/OWjmwCiT7H/dDso9aMJFPTyWz8Vh78FXM7ezJ1YYXknQo7rH381y8ybaHMK2tQiv/1vZ7f56B04doLawvde0O/DFhRUHfS5BfWc7jgRbUZBO+lsbtgduMlB+3+KnYNGI7agG5TlHgIEFVTmVS6rmrzOnhqAjnqtoRlV/zY8YOw79obV3wkarQ6qaOqhr5/VvO+9rA7q+rNL6Px++gv69b6dPEf7qQpBp82LCerGtI9UJ5JqkTePNTzQteL1Xkq3gtow3S3NacW/fBxfP2eWTB7x339XJUdy4X8X05ur6rRWfTapVhaJIqju7PyobG/n9ubAtR9Ulwa3gsbrB1WT91QyuRaj9ryc4NR1C2rXZBhpxatPsF3+Js3aTHEEjckMQfVUvUZQ+c61o5cTnDquY1iHVDKS3Ibu8d6qn5Bz0JhEyEErr8WgnJeTnDtWB8XJOw1J7kXtEtzbbm4kWgpq66DHBd4kiS5UvqCqeT61/1rbg7idipaC1m2taTxBxd0isylfULNiXaQvPAUVIe8W8bgBxz1j+RnSzWS6Q1y1S79oKagEj24RefxgOaWL4I56WaNzciMvCirAo1tEHv8sQZeTe9kc9O6lzrML2nXajY++kXeLyOOfI+iC2S/roFFIXAeVd4u0dyO4+swMFFdQUSteGi0FFSLtFjE3k7r0xhZUQOKNvNYlqC3mo71JWqD0Bq6DSki9kde6BK1eP5v65cxdwRcWtDs3NBoxKWJIvg3N+Gl58E2k3rv4t/qkBouIWp1T3SLml2Wql7O+CFL8ImgSUzhYpCXDYJHZYbpA40vszFxwZzBY5PzLT/2fN+FfkMcXq33sBhRURt4ctDRBVWqp+XpBgt5fbsYlfH3DFFTPfazHO+pTb+S1KkF1qV29RXo1N+cS3r4t4Ge4oKPjaxNv5LUuQVU3fJNgo414cbfIDBbJEL3xvKPqWumJMkOBgoqQd4vMAdHP8Bw0TrQUVIJHpX51BL+LjxMtBZV01Ht0i6wO/xzUbwOhiWgpaPONn2wdRc5BIYtyFwGDRcBXFilNUMk3Xt4tIok5sDHk1UEacH3HtXwDCDrqPaKloLI6k7hbRBJzX9AU3fJRuwMyZfYU9Brgdp2nIAIF9ZDVqd3dYQq6MkF3EYsk0bmPJxlPyOrS7v54bkHBx4OWJqhkLSGPy3kGcwj6yDF3BvogCw27nUeX9w6BPqI+oqA+hKZA5G4R73CC3HQ8cNT88kEcvgHgZ3VGFDTk5nxTIHLH8qxreK4v0p6U1M/UszqnoqWgyzeSZNdDmfjBHNQdaBlB4/bbxWUgYNrWuvMWvEPErYOGVPPWJWgckogyTPW0jSHnPfgHidqK/1UOBV3ucu1FJwRdgtz9oBQ0wRLgsaCgFLRefglw9zV6Am5685Pa41n8DHkwXauf1USioDfdTIsuAe68hKMfNFPWaWP3DmFWXznOq4RS0EFH/aJLgDsvsQ5Bv95N8z3OitUUNMMS4K5LrENQyaxOebQUFGgJ8Ps66P3PixOcgwo66kdWc6Ggw1Z8tH47jxAoCo4T0lFvtglyf+EFi15S0Nz9oDiF+Dj+RbxgydV2YgJz0BEoqIw093XZqwoABR1h0yZUjLF2NQX1Ru0oSEFH6AkaY8Ad66BXZO/ij5s3CjpCdkHbcLhqGkIaSbLRTOfd3yioGwxBkQt3Q0A3k3Q86Ne7W2IKuh5B0yoe0IqPOqKegpYuaOJMOGEOqs9iP6gDDEGn58JLrgAl6KwR9Xej48ME9aALgyrodK+yx+UiI3IPTlCAEfVpc93n6KiX5I5T7m08F7UPIVMTjoLmFlSS8U2cs0gXQHAddOKkiVKLgrZF/G/9FBr+FnA5nwDC4rt2Z5HT/vre1KOr+AaQrRYo3sjryQVVldCt+an5Us+ohaYRdPzMB3/o1/rj5K8BjaTJZPTZhubZBa27bTiXHg96r4/cQ1eAQfs3k6CRN/KioHGIoYLDKA/TEAQVwBxUQDmC+i9yG7N1n6QV5rGR19MLevQo3AWjb2YwL8vrSRm1dR9wIcG0Y/lGXosJ6oMNs4Cgx/FhicPkHKlZRcmsZmR8CQr39mLeIQCmHacN8+uCgpra0ORrY/kUhdkE2vVA0ExFPMK04/UIatqT0x0j4ikKs4kgaNSC3r8VDzDt+PkEFU9RmE2oV3ehcgnqMe1YEC0FlQoqnKIwH5FWgpOydTNNTzv2iJaCigWVTVFYhgn5snYzxRkgRkH9BRVNUViGcUFzdzPFjJaCxvi615CCZspB40BBAxN+aorCQkyV8M2fs9VBo0BB4yT83csFCLJ2M8WBgkZOeChBNZEKegpKQRMRJx+loEUIKp6isBBi6yjoUwgqn6KwDHLtKOgzCOoxwHYZPLRjHfQJBPWYorAMC/YbUNACBIXLQRdcFI+CFiCoxxSFEvCym4KWIKh8ikIB+NUPKGgRgi59uZRQUAoKDQWloNgA1EG7ubRp1geloKkvh0OSB1NTPi/7bU1B3axT0PjdTykezHTbfb2P7DFNQVcpaIIO/BQPZl98VK+fFNRFAZ+jP4UI2r34qLZlC+qDbyIV8Dn6U4igXcF+2afZTHYpQUNuTkoJn6M/fT9Frk6elKoVbwr5r3cK6mCdgvYQ5abTJ7Ef1B2Igs6BgqYKQ0GjUIagZTeSQm5OyuoFha6DOmO7bfRS0EgAChoHFvHuQBQUAArqDkRBAUjzYIAbeQVEREEBSNNRD7iRV0BEFBSApK86kbahCYiIggKQcrBIjbSRV0BEFBQA5qDuQBQUgER1ULyNvAIioqAApHkwwI28AiKioACwH9QdiIICQEHdgSgoABTUHYiCAkBB3YEoKAAU1B2IggJAQd2BKCgAFNQdiIICQEHdgSgoABTUHYiCAkBB3YEoKAAU1B2IggJAQd2BgAQVr2e5OiioOxCOoPL1LFcHBXUHghHUYz3L1UFB3YFgBPVYz3J1UFB3IBhBPdazXB0U1B0IRlCP9SxXBwV1B8IRVL6e5eqgoO5AQIIufTkcKKg7EAXNR7e+HAV1B0IUtLhGUtii9dcVECmoOxCioLdXCd7EYSEC7y21oFw8bJInKeIxBeXiYdOsU9A7G0Nz96R1UC59I8AvgLhIyssDHefWPlI8GBcPE+DXUS8ukvJSyEZezEEFBL3qnE7QvBQiKBcPExAyWKSeLpIyE787Ic2DcfGwSVaZgyaA/aDuQDCCehRJq4OCugPhCCovklZH4gfjTnMuSmhLILDsg93vNOfD/VXShJl1c+KkmJeSiS+Hw2ofDJ3Ygq6WuOlEpCyX8OMxzflrxsAzmXwzRyhoRkGn38wRCppPUEG/MqGg+QQVvJkjFJQ5KDQUNGsddOrNHKGgOVvxk2/mCAXNKSiZhIJSUGj4ARBoKCiBhoISaCgogYaCEmgoKIGGghJoKCiBhoISaCgogYaCEmgoKIGGghJo0guqZy7q8binzeblwy/w0QYJCKuo9EjLgMBmpOY2POaInHdmwOj5l5/6djR2PyCTuN3Ry48Z92oisml+/eAU3SfRbig8KyIPkgv69d4811F91Kfmh5PfZ61WhNFBAsIqTvqTDQl8/t6eHxhzTM47beNl301cMjv69hO3O3qaMfhZR2TTfHjt7pNQGwqflKFzIvIguaAmdZvnMzNwqq1H2Mv+TX0I2zogrAmvBA0KbGexBcYcFZOEp970ebuUU5e416Nf74eHF5FG1KX54Nq9T2Jbm/SYE5EHC9VBmy/fMDHl3CWWnOPrvxpBgwIft+b/oXcdE30Pp81bN/XzvBtMYWoz+PbojPl3bVZdtxr2rt0dvQq60ES/hQStvv00hab//FpVpoSFbUKpOmhQ4OrvpgIWetcxsd50d1ENb6f9tf3fjPpIJ+ixu0Y/quOgiF+o4rOMoGrWonke36c6mTZASFhVOitBQwJf9ip7qELvOi63gury9ko7JdQe7SwLjuh0bRv1ppuebpu6MyLyYBFBT7aNFPJRf72/fgaFVUVQqKCGxghEQYd3c2rbMfbojb4hEek071+7d1RlqaYyMSMiD5YQ1HwNgwtLVX8NCKvDBBfx5hK7A2IRX/Urf10eZ4/GENR+qW+m6w9bEqsRtF0iK7i5oTQJCHu0XYPh7ZzGTphGUt0JOhCjW3+sOxpFUNPhdLucRHO0V6KsRdDrHvPeHTZt/0pQF5WhCuxmmh9zRG4E7df9urVJrkdn1kG7J+9du5ce1z+vpQ567RIJ6PLu/ArtLq9CO+q1ktWMmCNyI2jvbnr9Td3Rua14m+bDvqzuk7jWQVfSim9LWt1D4f/SsLIv9QLC6vC6YhYSeG7MEbkRtK1vqB7JfuLaWsjsftD2ybtrt12fNj0q+wJ0Vf2gZAaOsvT8j0dHe2s64kbkAQXFx+HN6WEbZfa7+CUi8oCC4mNHM93w30cVjwijmRaIyAMKSqChoAQaCkqgoaAEGgpKoKGgBBoKSqChoAQaCkqgoaAEGgpKoKGgBBoKSqChoAQaCkqgoaAEGgpKoKGgBBoKSqChoAQaCkqgoaAEGgpKoKGgBBpoQR+trnIaW3BloeVYSqXE9CxNUIAkK5cS05OCPhElpieooEe9zVuTejoB1T/nnVktedNuhqaWALz8+GNjF3XVqwOqE82ygW+1PYnUJacnpqBqr5PL/q2XoO1eQeZ3vTPN7q3di6PudhI62PxALZZpTyJFpyekoHb1816CXrdgaTdDU8u5dquk9/9a93ZMy7z7AQolpyekoHadyl6C2o0q1e9m7enmpK4C1f9ru11Kd1KOBwCj5PTEFPS73fLnWmfSe++aWtF1a9+uht/7a7sj2nBX4Oem5PTEFPT+G69/r14+rt/4+rYJ2v510SX+y6Dk9IQUdFBnertL4F5JdBiEOpisQdf04ftPFqTk9IQUVBcqX+/bJlFU8jTlzcHuGq8TWJc59guuuP710G2Eak/K+BgwFJyemIJe++3Unu+b39uKkk4i22/XVOOv3+r2r/oTsHWl9iRSl5yeoIISYqCgBBoKSqChoAQaCkqgoaAEGgpKoKGgBBoKSqChoAQaCkqgoaAEGgpKoKGgBBoKSqChoAQaCkqgoaAEGgpKoKGgBBoKSqChoAQaCkqgoaAEmv8DNNk4ji+Mc58AAAAASUVORK5CYII=" /><!-- --> Figures 1 and 2 show potential informativeness in cluster size for the <em>screen8</em> data. Cluster size appears to be negatively associated with average standardized test scores but positively associated with the proportion of male students and the proportion participating in sports-related extracurricular activities.</p>
+<p>These empirical results can be verified using the test for ICS, implemented through the function <em>icstestClust</em>, as illustrated below. The result of this test suggests that cluster size is informative for standardized math test scores. Cluster size is also informative for standardized reading test scores, gender, and sports as an extracurricular activity (<em>p</em> &lt; .001, results not shown).</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" title="1"><span class="co">## example code to perform test for ICS (not run due to computational time)</span></a>
+<a class="sourceLine" id="cb6-2" title="2"><span class="kw">set.seed</span>(<span class="dv">100</span>)</a>
+<a class="sourceLine" id="cb6-3" title="3">ics.math &lt;-<span class="st"> </span><span class="kw">icstestClust</span>(screen8<span class="op">$</span>math, screen8<span class="op">$</span>sch.id, <span class="dt">B =</span> <span class="dv">1000</span>, <span class="dt">print.it =</span> <span class="ot">FALSE</span>)</a>
+<a class="sourceLine" id="cb6-4" title="4">    </a>
+<a class="sourceLine" id="cb6-5" title="5">ics.math</a>
+<a class="sourceLine" id="cb6-6" title="6">Test of informative cluster <span class="kw">size</span> (TF)</a>
+<a class="sourceLine" id="cb6-7" title="7">data<span class="op">:</span><span class="st">  </span>screen8<span class="op">$</span>math</a>
+<a class="sourceLine" id="cb6-8" title="8">TF =<span class="st"> </span><span class="fl">0.029686</span>, p<span class="op">-</span>value <span class="op">&lt;</span><span class="st"> </span><span class="fl">2.2e-16</span></a></code></pre></div>
+<p>Within the <em>icstestClust</em> function, the type of test statistic, TF or TCM, is specified using the <em>test.method</em> argument. It is suggested to use TCM when there is a small number of distinct cluster sizes, as it tends to be more powerful. TF is preferred when the number of distinct cluster sizes is large and the number of clusters with those sizes is small, as TCM tends to be too liberal. Readers are pointed to <span class="citation">Nevalainen, Oja, and Datta (<a href="#ref-nevalainen17" role="doc-biblioref">2017</a>)</span> for more details. The number of bootstrap loops is specified by argument <em>B</em>, while argument <em>print.it</em> is a logical indicating whether to print the progress of the bootstrap procedure. We note that the need for bootstrap resampling in <em>icstestClust</em> can make its implementation computationally expensive.</p>
+</div>
+<div id="testing-a-marginal-proportion" class="section level2">
+<h2>Testing a marginal proportion</h2>
+<p>The first question of interest suggests a one-sample test of a proportion via <em>proptestClust</em>. We specify a one-sided alternative and use the default sandwich variance estimator evaluated at the null value of the proportion (<em>variance = “sand.null”</em>), shown to perform best for this test <span class="citation">(Gregg, Datta, and Lorenz <a href="#ref-gregg20" role="doc-biblioref">2020</a>)</span>.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" title="1">screen8<span class="op">$</span>math.p &lt;-<span class="st"> </span><span class="dv">1</span><span class="op">*</span>(screen8<span class="op">$</span>math <span class="op">&gt;=</span><span class="st"> </span><span class="dv">65</span>)</a>
+<a class="sourceLine" id="cb7-2" title="2"><span class="kw">proptestClust</span>(screen8<span class="op">$</span>math.p, screen8<span class="op">$</span>sch.id, <span class="dt">p =</span> <span class="fl">.75</span>, <span class="dt">alternative =</span> <span class="st">&quot;great&quot;</span>)</a>
+<a class="sourceLine" id="cb7-3" title="3"><span class="co">#&gt; </span></a>
+<a class="sourceLine" id="cb7-4" title="4"><span class="co">#&gt;  Cluster-weighted proportion test with variance est: sand.null</span></a>
+<a class="sourceLine" id="cb7-5" title="5"><span class="co">#&gt; </span></a>
+<a class="sourceLine" id="cb7-6" title="6"><span class="co">#&gt; data:  screen8$math.p, M = 73</span></a>
+<a class="sourceLine" id="cb7-7" title="7"><span class="co">#&gt; z = 0.70159, p-value = 0.2415</span></a>
+<a class="sourceLine" id="cb7-8" title="8"><span class="co">#&gt; alternative hypothesis: true p is greater than 0.75</span></a>
+<a class="sourceLine" id="cb7-9" title="9"><span class="co">#&gt; 95 percent confidence interval:</span></a>
+<a class="sourceLine" id="cb7-10" title="10"><span class="co">#&gt;  0.7311459 1.0000000</span></a>
+<a class="sourceLine" id="cb7-11" title="11"><span class="co">#&gt; sample estimates:</span></a>
+<a class="sourceLine" id="cb7-12" title="12"><span class="co">#&gt; Cluster-weighted proportion </span></a>
+<a class="sourceLine" id="cb7-13" title="13"><span class="co">#&gt;                   0.7640235</span></a></code></pre></div>
+<p>As noted previously, <em>htestClust</em> functions produce objects of class <em>htest</em>, producing familiar output through the <em>print</em> method for such objects. We conclude that the proportion of students with proficient math test scores is not greater than 0.75.</p>
+</div>
+<div id="independence-test" class="section level2">
+<h2>Independence test</h2>
+<p>The second question suggests a test of independence of extracurricular activity and gender. We start by producing cluster-weighted estimates of the proportion of students participating in each activity within each gender.</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" title="1">tab &lt;-<span class="st"> </span><span class="kw">table</span>(screen8<span class="op">$</span>gender, screen8<span class="op">$</span>activity, screen8<span class="op">$</span>sch.id) </a>
+<a class="sourceLine" id="cb8-2" title="2">ptab &lt;-<span class="st"> </span><span class="kw">prop.table</span>(tab, <span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">3</span>))</a>
+<a class="sourceLine" id="cb8-3" title="3"><span class="kw">apply</span>(ptab, <span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">2</span>), mean)</a>
+<a class="sourceLine" id="cb8-4" title="4"><span class="co">#&gt;    </span></a>
+<a class="sourceLine" id="cb8-5" title="5"><span class="co">#&gt;      academic     other    sports</span></a>
+<a class="sourceLine" id="cb8-6" title="6"><span class="co">#&gt;   F 0.3952102 0.2968473 0.3079425</span></a>
+<a class="sourceLine" id="cb8-7" title="7"><span class="co">#&gt;   M 0.3790267 0.3186699 0.3023035</span></a></code></pre></div>
+<p>The cluster-weighted proportions appear roughly similar, and we can test using <em>chisqtestClust</em>. Here, the default method of variance estimation is method of moments (<em>variance = “MoM”</em>), demonstrated to be best for the test of independence <span class="citation">(Gregg, Datta, and Lorenz <a href="#ref-gregg20" role="doc-biblioref">2020</a>)</span>.</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" title="1"><span class="kw">chisqtestClust</span>(screen8<span class="op">$</span>gender, screen8<span class="op">$</span>activity, screen8<span class="op">$</span>sch.id)</a>
+<a class="sourceLine" id="cb9-2" title="2"><span class="co">#&gt; </span></a>
+<a class="sourceLine" id="cb9-3" title="3"><span class="co">#&gt;  Cluster-weighted Chi-squared test of independence with variance est:</span></a>
+<a class="sourceLine" id="cb9-4" title="4"><span class="co">#&gt;  MoM</span></a>
+<a class="sourceLine" id="cb9-5" title="5"><span class="co">#&gt; </span></a>
+<a class="sourceLine" id="cb9-6" title="6"><span class="co">#&gt; data:  screen8$gender and screen8$activity, M = 73</span></a>
+<a class="sourceLine" id="cb9-7" title="7"><span class="co">#&gt; X-squared = 1.6131, df = 2, p-value = 0.4464</span></a></code></pre></div>
+<p>Before proceeding to the next analysis, we note that further evidence of ICS in the <em>screen8</em> data can be demonstrated by implementing the standard chi-squared test for this question, which suggests that females were more likely to participate in academic extracurricular activities and males in sports.</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" title="1"><span class="kw">prop.table</span>(<span class="kw">table</span>(screen8<span class="op">$</span>gender, screen8<span class="op">$</span>activity), <span class="dv">1</span>)</a>
+<a class="sourceLine" id="cb10-2" title="2"><span class="co">#&gt;    </span></a>
+<a class="sourceLine" id="cb10-3" title="3"><span class="co">#&gt;      academic     other    sports</span></a>
+<a class="sourceLine" id="cb10-4" title="4"><span class="co">#&gt;   F 0.3891323 0.2979842 0.3128834</span></a>
+<a class="sourceLine" id="cb10-5" title="5"><span class="co">#&gt;   M 0.3370268 0.3120960 0.3508772</span></a></code></pre></div>
+</div>
+<div id="tests-of-quantitative-variables-for-two-or-more-groups" class="section level2">
+<h2>Tests of quantitative variables for two or more groups</h2>
+<p>We compare math test scores between males and females using the <em>ttestClust</em> function. We conclude that mean standardized test scores are equivalent between males and females, a departure from the conclusion reached by the standard <em>t</em> test (p &lt; .001, results not shown).</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" title="1"><span class="kw">ttestClust</span>(math <span class="op">~</span><span class="st"> </span>gender, <span class="dt">id =</span> sch.id, <span class="dt">data =</span> screen8)</a>
+<a class="sourceLine" id="cb11-2" title="2"><span class="co">#&gt; </span></a>
+<a class="sourceLine" id="cb11-3" title="3"><span class="co">#&gt;  Two sample group-weighted test of means</span></a>
+<a class="sourceLine" id="cb11-4" title="4"><span class="co">#&gt; </span></a>
+<a class="sourceLine" id="cb11-5" title="5"><span class="co">#&gt; data:  math by gender, M = 73</span></a>
+<a class="sourceLine" id="cb11-6" title="6"><span class="co">#&gt; z = 1.3495, p-value = 0.1772</span></a>
+<a class="sourceLine" id="cb11-7" title="7"><span class="co">#&gt; alternative hypothesis: true difference in means is not equal to 0</span></a>
+<a class="sourceLine" id="cb11-8" title="8"><span class="co">#&gt; 95 percent confidence interval:</span></a>
+<a class="sourceLine" id="cb11-9" title="9"><span class="co">#&gt;  -0.2234259  1.2111344</span></a>
+<a class="sourceLine" id="cb11-10" title="10"><span class="co">#&gt; sample estimates:</span></a>
+<a class="sourceLine" id="cb11-11" title="11"><span class="co">#&gt; weighted mean in group F weighted mean in group M </span></a>
+<a class="sourceLine" id="cb11-12" title="12"><span class="co">#&gt;                 70.75124                 70.25739</span></a></code></pre></div>
+<p>Even though this test does not make use of the <span class="math inline">\(t\)</span> distribution, we have named it as such to parallel the standard <span class="math inline">\(t\)</span>-test means (<em>t.test</em> in R). Multi-group tests of quantitative parameters in <em>htestClust</em> necessarily implement jackknife variance estimation, so specification of variance estimation method is not necessary. In addition to the formula implementation used above, we note that <em>ttestClust</em> can also accept vectors of data and cluster identifiers for each of the two groups.</p>
+<p>An alternative approach to this comparison, particularly if test scores were skewed in any way, would be a rank-based test. <em>wilcoxtestClust</em> implements the group-weighted analogue of the Wilcoxon test, which we use as an alternative method for the comparison of math test scores between males and females.</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb12-1" title="1"><span class="co">## code to run group-weighted Wilcoxon test analogue (not run due to computational time)</span></a>
+<a class="sourceLine" id="cb12-2" title="2"><span class="kw">wilcoxtestClust</span>(math <span class="op">~</span><span class="st"> </span>gender, <span class="dt">id =</span> sch.id, <span class="dt">data =</span> screen8, <span class="dt">method =</span> <span class="st">&quot;group&quot;</span>)</a></code></pre></div>
+<p>Our conclusion is the same as with the reweighted test of means. We note that this test requires estimation of the cluster-weighted empirical cumulative distribution <span class="citation">(Dutta and Datta <a href="#ref-dutta16" role="doc-biblioref">2016</a>)</span> as well as jackknife variance estimation, so there is an added measure of computational expense in using <em>wilcoxtestClust</em>.</p>
+<p>Finally, we compare reading test scores among the three groups defined by extracurricular activity, using <em>onewaytestClust</em>. Mean standardized reading test scores are not appreciably different among extracurricular activity groups.</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb13-1" title="1"><span class="kw">onewaytestClust</span>(read <span class="op">~</span><span class="st"> </span>activity, <span class="dt">id =</span> sch.id, <span class="dt">data =</span> screen8)</a>
+<a class="sourceLine" id="cb13-2" title="2"><span class="co">#&gt; </span></a>
+<a class="sourceLine" id="cb13-3" title="3"><span class="co">#&gt;  Reweighted one-way analysis of means for clustered data</span></a>
+<a class="sourceLine" id="cb13-4" title="4"><span class="co">#&gt; </span></a>
+<a class="sourceLine" id="cb13-5" title="5"><span class="co">#&gt; data:  read and activity, M = 73</span></a>
+<a class="sourceLine" id="cb13-6" title="6"><span class="co">#&gt; X-squared = 1.3191, df = 2, p-value = 0.5171</span></a>
+<a class="sourceLine" id="cb13-7" title="7"><span class="co">#&gt; sample estimates:</span></a>
+<a class="sourceLine" id="cb13-8" title="8"><span class="co">#&gt; academic    other   sports </span></a>
+<a class="sourceLine" id="cb13-9" title="9"><span class="co">#&gt; 60.11498 60.40785 59.69659</span></a></code></pre></div>
+</div>
+</div>
+<div id="discussion" class="section level1">
+<h1>Discussion</h1>
+<p>Standard model-based inference of clustered data can be biased when cluster or group size is informative. Reweighting methods that correct for this bias have been established and a number of authors have applied such weighting to develop direct hypothesis tests of marginal parameters in clustered data. Such tests can be interpreted as clustered analogues to common classical statistical tests, and include methods related to ranks, correlation, proportions, means and variances. While these methods are effective and intuitive, all but a few of these tests have remained inaccessible to many researchers due to an absence of convenient software.</p>
+<p>In this vignette we summarized <em>htestClust</em>, which is the first R package designed as a comprehensive library of inferential methods appropriate for clustered data with ICS/IWCGS. Most functions in <em>htestClust</em> perform hypothesis tests for clustered data that have an analogous classical form, and the interface of the package has been designed to reflect this relationship. Function syntax has been purposefully structured to resemble that of functions available in the native R environment that perform the analogous classical tests. Many functions have been designed with a secondary interface that operates through table or formula input, allowing flexibility in data structure. In addition to the hypothesis tests of marginal parameters, <em>htestClust</em> also includes functions to visualize potential informativeness and test for ICS. These tools allow analysts to explore the effect and degree of informativeness in their data.</p>
+<p>With the exception of the test for ICS, the hypothesis tests performed by <em>htestClust</em> are derived through the asymptotic normality of reweighted parameters, and their asymptotic convergence is indexed by the number of clusters. As such, their use should only be considered when the number of clusters is sufficiently large (at least 30). Additionally, these methods retain a cluster-based marginal interpretation, making them appropriate when clusters, rather than intra-cluster observations, are the unit of interest. The marginal nature of these tests provides researchers with an analysis corresponding to a snapshot in time. If analysis of temporal aspects or effects of additional covariates is desired, readers might instead consider reweighted model-based methods such as those by <span class="citation">Bible, Beck, and Datta (<a href="#ref-bible16" role="doc-biblioref">2016</a>)</span>, <span class="citation">Neuhaus and McCulloch (<a href="#ref-neuhaus11" role="doc-biblioref">2011</a>)</span>, and <span class="citation">Wang, Kong, and Datta (<a href="#ref-wang11" role="doc-biblioref">2011</a>)</span>.</p>
+<p><em>htestClust</em> is a tool to facilitate the analysis of clustered data, and we have designed its use to be accessible and intuitive. While we have not shown the full functionality of all of the <em>htestClust</em> functions, the syntax and usage is similar and fully documented with examples in the help files. While the inferntial methods performed by this package have been developed to correct for the biasing effects of ICS/IWCGS, they remain applicable when fluctuations of cluster or group size are unrelated to the outcome of interest. As such, this package is an effective resource for researchers addressing marginal analyses in clustered data with any variation in the cluster and/or group sizes.</p>
+</div>
+<div id="citations" class="section level1 unnumbered">
+<h1>Citations</h1>
+<div id="refs" class="references">
+<div id="ref-bible16">
+<p>Bible, Joe, James D Beck, and Somnath Datta. 2016. “Cluster Adjusted Regression for Displaced Subject Data (Cards): Marginal Inference Under Potentially Informative Temporal Cluster Size Profiles.” <em>Biometrics</em> 72 (2): 441–51. <a href="https://doi.org/10.1111/biom.12456">https://doi.org/10.1111/biom.12456</a>.</p>
+</div>
+<div id="ref-carey19">
+<p>Carey, Vincent J, Thomas Lumley, and Brian Ripley. 2019. <em>Gee: Generalized Estimation Equation Solver</em>. <a href="https://CRAN.R-project.org/package=gee">https://CRAN.R-project.org/package=gee</a>.</p>
+</div>
+<div id="ref-chaurasia18">
+<p>Chaurasia, Ashok, Danping Liu, and Paul S Albert. 2018. “Pattern-Mixture Models with Incomplete Informative Cluster Size: Application to a Repeated Pregnancy Study.” <em>Journal of the Royal Statistical Society C</em> 67 (1): 255. <a href="https://doi.org/10.1111/rssc.12226">https://doi.org/10.1111/rssc.12226</a>.</p>
+</div>
+<div id="ref-datta05">
+<p>Datta, Somnath, and Glen A Satten. 2005. “Rank-Sum Tests for Clustered Data.” <em>Journal of the American Statistical Association</em> 100 (471): 908–15. <a href="https://doi.org/10.1198/016214504000001583">https://doi.org/10.1198/016214504000001583</a>.</p>
+</div>
+<div id="ref-datta08">
+<p>———. 2008. “A Signed-Rank Test for Clustered Data.” <em>Biometrics</em> 64 (2): 501–7. <a href="https://doi.org/10.1111/j.1541-0420.2007.00923.x">https://doi.org/10.1111/j.1541-0420.2007.00923.x</a>.</p>
+</div>
+<div id="ref-dutta16">
+<p>Dutta, Sandipan, and Somnath Datta. 2016. “A Rank-Sum Test for Clustered Data When the Number of Subjects in a Group Within a Cluster Is Informative.” <em>Biometrics</em> 72 (2): 432–40. <a href="https://doi.org/10.1111/biom.12447">https://doi.org/10.1111/biom.12447</a>.</p>
+</div>
+<div id="ref-greggdis20">
+<p>Gregg, Mary. 2020. “Marginal Methods and Software for Clustered Data with Cluster- and Group-Size Informativeness.” PhD thesis, UL (University of Louisville).</p>
+</div>
+<div id="ref-gregg20">
+<p>Gregg, Mary, Somnath Datta, and Doug Lorenz. 2020. “Variance Estimation in Tests of Clustered Categorical Data with Informative Cluster Size.” <em>Statistical Methods in Medical Research</em> 29 (11): 3396–3408. <a href="https://doi.org/10.1177/0962280220928572">https://doi.org/10.1177/0962280220928572</a>.</p>
+</div>
+<div id="ref-halekoh06">
+<p>Halekoh, Ulrich, Søren Højsgaard, Jun Yan, and others. 2006. “The R Package Geepack for Generalized Estimating Equations.” <em>Journal of Statistical Software</em> 15 (2): 1–11.</p>
+</div>
+<div id="ref-huang11">
+<p>Huang, Ying, and Brian Leroux. 2011. “Informative Cluster Sizes for Subcluster-Level Covariates and Weighted Generalized Estimating Equations.” <em>Biometrics</em> 67 (3): 843–51. <a href="https://doi.org/10.1111/j.1541-0420.2010.01542.x">https://doi.org/10.1111/j.1541-0420.2010.01542.x</a>.</p>
+</div>
+<div id="ref-iosif14">
+<p>Iosif, Ana-Maria, and Allan R Sampson. 2014. “A Model for Repeated Clustered Data with Informative Cluster Sizes.” <em>Statistics in Medicine</em> 33 (5): 738–59. <a href="https://doi.org/10.1002/sim.5988">https://doi.org/10.1002/sim.5988</a>.</p>
+</div>
+<div id="ref-lorenz11">
+<p>Lorenz, Douglas J, Somnath Datta, and Susan J Harkema. 2011. “Marginal Association Measures for Clustered Data.” <em>Statistics in Medicine</em> 30 (27): 3181–91. <a href="https://doi.org/10.1002/sim.4368">https://doi.org/10.1002/sim.4368</a>.</p>
+</div>
+<div id="ref-lorenz18">
+<p>Lorenz, Douglas J, Steven Levy, and Somnath Datta. 2018. “Inferring Marginal Association with Paired and Unpaired Clustered Data.” <em>Statistical Methods in Medical Research</em> 27 (6): 1806–17. <a href="https://doi.org/10.1177/0962280216669184">https://doi.org/10.1177/0962280216669184</a>.</p>
+</div>
+<div id="ref-mitani20">
+<p>Mitani, AA, EK Kaye, and KP Nelson. 2020. “Marginal Analysis of Multiple Outcomes with Informative Cluster Size.” <em>Biometrics</em>. <a href="https://doi.org/10.1111/biom.13241">https://doi.org/10.1111/biom.13241</a>.</p>
+</div>
+<div id="ref-mitani19">
+<p>Mitani, Aya A, Elizabeth K Kaye, and Kerrie P Nelson. 2019. “Marginal Analysis of Ordinal Clustered Longitudinal Data with Informative Cluster Size.” <em>Biometrics</em> 75 (3): 938–49. <a href="https://doi.org/10.1111/biom.13050">https://doi.org/10.1111/biom.13050</a>.</p>
+</div>
+<div id="ref-neuhaus11">
+<p>Neuhaus, John M, and Charles E McCulloch. 2011. “Estimation of Covariate Effects in Generalized Linear Mixed Models with Informative Cluster Sizes.” <em>Biometrika</em> 98 (1): 147–62. <a href="https://doi.org/10.1093/biomet/asq066">https://doi.org/10.1093/biomet/asq066</a>.</p>
+</div>
+<div id="ref-nevalainen17">
+<p>Nevalainen, Jaakko, Hannu Oja, and Somnath Datta. 2017. “Tests for Informative Cluster Size Using a Novel Balanced Bootstrap Scheme.” <em>Statistics in Medicine</em> 36 (16): 2630–40. <a href="https://doi.org/10.1002/sim.7288">https://doi.org/10.1002/sim.7288</a>.</p>
+</div>
+<div id="ref-pavlou12">
+<p>Pavlou, Menelaos. 2012. “Analysis of Clustered Data When the Cluster Size Is Informative.” PhD thesis, UCL (University College London).</p>
+</div>
+<div id="ref-wang11">
+<p>Wang, Ming, Maiying Kong, and Somnath Datta. 2011. “Inference for Marginal Linear Models for Clustered Longitudinal Data with Potentially Informative Cluster Sizes.” <em>Statistical Methods in Medical Research</em> 20 (4): 347–67. <a href="https://doi.org/10.1177/0962280209347043">https://doi.org/10.1177/0962280209347043</a>.</p>
+</div>
+<div id="ref-williamson03">
+<p>Williamson, John M, Somnath Datta, and Glen A Satten. 2003. “Marginal Analyses of Clustered Data When Cluster Size Is Informative.” <em>Biometrics</em> 59 (1): 36–42. <a href="https://doi.org/10.1111/1541-0420.00005">https://doi.org/10.1111/1541-0420.00005</a>.</p>
+</div>
+</div>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

@@ -1,4 +1,4 @@
-52236aa1539f92a55f820d6b7e3c252f *DESCRIPTION
+6c0affeba8f2b5b8dbd86808a9844983 *DESCRIPTION
 1e948abc4d712e2f7e19b6504c9c1e43 *LICENSE
 7694728a3a92d1e5e945a72da7f784c2 *NAMESPACE
 f1d196bc8342ad54095bc27ff7def1b9 *R/chisqtestClust.R
@@ -8,12 +8,16 @@ a9b38b2dd2b7620a0325b352c19144bc *R/icstestClust.R
 59ba89c00c2f2d61c5feed98895d75d7 *R/levenetestClust.R
 e3309fd113e3929daa79b8deb0a8a5a2 *R/mcnemartestClust.R
 4f3691ddf614428535ce125541296934 *R/onewaytestClust.R
-17559bd80d295a2eddba60b2483028b9 *R/proptestClust.R
+75b6d12dbb96c50521c29bdf3c559922 *R/proptestClust.R
 dce3cff6b2dc3f72bd7ccdbeaed8ef6b *R/screen8.R
 4f0974235e9777afda858fea522c775c *R/ttestClust.R
 3b65f548f4fc40eaa0f2797d8a59a58e *R/vartestClust.R
 32f99fb28ddd28a6952eb88a81e1a0ae *R/wilcoxtestClust.R
+0d0e7c96bda08ece419cd9774b7918ed *build/vignette.rds
 3d3155cb419d968eb3925051087fb050 *data/screen8.RData
+df264e6c6de1aa76ab9ecb7073b6986b *inst/doc/htestClust.R
+f203d1996a690ccd634acffa20b141a7 *inst/doc/htestClust.Rmd
+9a8c2a20f596290a8e9bcd6f09de9178 *inst/doc/htestClust.html
 694cb99e568a7b9c182dc48b8f290818 *man/chisqtestClust.Rd
 59941499330ffcdee690b37e10c837e4 *man/cortestClust.Rd
 a6c924e402bb0a8cbfedb315f4c4b3ed *man/icsPlot.Rd
@@ -21,8 +25,10 @@ e0cf36c70bd98cbd754f56eb5c81cf22 *man/icstestClust.Rd
 bdc625d1baed30898f337e2bd3f8aa7c *man/levenetestClust.Rd
 7719644cd7376910fce28d28f2445844 *man/mcnemartestClust.Rd
 4902ca15baad88a2d69af43a1d838c84 *man/onewaytestClust.Rd
-d58b87b9620a3fbe9925a108bb9ed33d *man/proptestClust.Rd
+7eb29978dfcef4e397a7d7aafa5859e7 *man/proptestClust.Rd
 e78d2207c47e5f76d61727a06f4ed945 *man/screen8.Rd
 6bc7ff469573f1a374ac5022654048e9 *man/ttestClust.Rd
 0b2ec803af4d15c8081423438355fbbe *man/vartestClust.Rd
 81f2d8a25d4e82732498a0761fac231a *man/wilcoxtestClust.Rd
+f203d1996a690ccd634acffa20b141a7 *vignettes/htestClust.Rmd
+c1febadec6103c4c739f172ca4093862 *vignettes/htestClustBib.bib
